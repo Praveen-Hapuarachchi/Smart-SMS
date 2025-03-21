@@ -51,14 +51,13 @@ jobs:
         run: |
           echo "$EC2_SSH_KEY" > key.pem
           chmod 400 key.pem
+          # Copy docker-compose.yml to EC2 and deploy
+          scp -o StrictHostKeyChecking=no -i key.pem ${{ github.workspace }}/docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/ubuntu/app/docker-compose.yml
           ssh -o StrictHostKeyChecking=no -i key.pem ${EC2_USER}@${EC2_HOST} << 'EOF'
-            # Commands to run on EC2
             sudo mkdir -p /home/ubuntu/app
             sudo chown ubuntu:ubuntu /home/ubuntu/app
             cd /home/ubuntu/app
-            echo "version: '3'" > docker-compose.yml
-            echo "$(cat ${{ github.workspace }}/docker-compose.yml)" >> docker-compose.yml
-            docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            sudo /usr/local/bin/docker-compose down
+            sudo /usr/local/bin/docker-compose pull
+            sudo /usr/local/bin/docker-compose up -d
           EOF
