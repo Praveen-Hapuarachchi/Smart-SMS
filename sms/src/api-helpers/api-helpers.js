@@ -31,7 +31,7 @@ export const getAllUsers = async () => {
 // Function to send user authentication request
 export const sendUserAuthRequest = async (data) => {
     try {
-        const res = await axios.post("http://localhost:8050/auth/login", {
+        const res = await axios.post("http://13.49.246.194:8050/auth/login", {
             email: data.email,
             password: data.password,
         });
