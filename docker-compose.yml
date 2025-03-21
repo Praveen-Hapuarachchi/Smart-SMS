@@ -1,0 +1,46 @@
+services:
+  backend:
+    build:
+      context: ./smsbackend/smsbackend
+      dockerfile: Dockerfile
+    image: praveenlichchavi/sms-backend:latest
+    ports:
+      - "8050:8050"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/smsbackend_2?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=0404ENG@uor
+      - SECURITY_JWT_SECRET_KEY=3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+      - JAVA_OPTS=-Xmx512m -Xms256m  # Limit JVM memory
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./sms
+      dockerfile: Dockerfile
+    image: praveenlichchavi/sms-frontend:latest
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 0404ENG@uor
+      MYSQL_DATABASE: smsbackend_2
+    ports:
+      - "3307:3306"
+  
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: praveenlichchavi/sms-nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend

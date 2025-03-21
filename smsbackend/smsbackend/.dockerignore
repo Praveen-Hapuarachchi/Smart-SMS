@@ -1,0 +1,38 @@
+# Ignore the target directory where compiled Java classes and the JAR file are stored
+target/
+
+# Ignore IntelliJ IDEA project files
+.idea/
+
+# Ignore Maven wrapper and related files
+.mvn/
+mvnw
+mvnw.cmd
+
+# Ignore any log files or log folder generated during runtime
+logs/
+*.log
+
+# Ignore Git repository and config files
+.git/
+.gitignore
+
+# Ignore help or documentation files
+HELP.md
+README.md
+
+# Ignore IDE or editor-specific files
+.vscode/
+
+# Ignore test reports or coverage files
+surefire-reports/
+jacoco/
+
+# Ignore local configuration files
+application-local.properties
+
+# Ignore macOS-specific files
+.DS_Store
+
+# Optional: Ignore docker-compose if present
+docker-compose.yml
