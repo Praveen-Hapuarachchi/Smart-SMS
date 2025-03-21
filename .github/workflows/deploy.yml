@@ -26,20 +26,23 @@ jobs:
 
       # Build and push backend image
       - name: Build and push backend
+        working-directory: ./smsbackend/smsbackend
         run: |
-          docker build -t praveenlichchavi/sms-backend:latest ./smsbackend/smsbackend
+          docker build -t praveenlichchavi/sms-backend:latest .
           docker push praveenlichchavi/sms-backend:latest
 
       # Build and push frontend image
       - name: Build and push frontend
+        working-directory: ./sms
         run: |
-          docker build -t praveenlichchavi/sms-frontend:latest ./sms
+          docker build -t praveenlichchavi/sms-frontend:latest .
           docker push praveenlichchavi/sms-frontend:latest
 
       # Build and push nginx image
       - name: Build and push nginx
+        working-directory: ./nginx
         run: |
-          docker build -t praveenlichchavi/sms-nginx:latest ./nginx
+          docker build -t praveenlichchavi/sms-nginx:latest .
           docker push praveenlichchavi/sms-nginx:latest
 
       # Deploy to EC2
@@ -51,13 +54,15 @@ jobs:
         run: |
           echo "$EC2_SSH_KEY" > key.pem
           chmod 400 key.pem
-          # Copy docker-compose.yml to EC2 and deploy
-          scp -o StrictHostKeyChecking=no -i key.pem ${{ github.workspace }}/docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/ubuntu/app/docker-compose.yml
+          scp -o StrictHostKeyChecking=no -i key.pem docker-compose.yml ${EC2_USER}@${EC2_HOST}:/home/ubuntu/app/docker-compose.yml
           ssh -o StrictHostKeyChecking=no -i key.pem ${EC2_USER}@${EC2_HOST} << 'EOF'
-            sudo mkdir -p /home/ubuntu/app
-            sudo chown ubuntu:ubuntu /home/ubuntu/app
             cd /home/ubuntu/app
-            sudo /usr/local/bin/docker-compose down
-            sudo /usr/local/bin/docker-compose pull
-            sudo /usr/local/bin/docker-compose up -d
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker-compose down
+            docker-compose pull
+            docker-compose up -d
+            docker logout
           EOF
+          rm -f key.pem
