@@ -2,6 +2,7 @@
 import axios from "axios";
 
 const base_url = "http://206.189.142.249:8050"; // Define base URL
+//const base_url = "http://localhost:8050"; // Define base URL
 
 // Get all users using axios
 export const getAllUsers = async () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { getSubjectById , removeMaterial ,getAnnouncements , createAnnouncement ,deleteAnnouncement} from '../../api-helpers/api-helpers';
 import HeaderForUser from './HeaderForUser';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete'; // Import DeleteIcon
 import Footer from '../Footer';
 
 const base_url = "http://206.189.142.249:8050"; // Define base URL
+//const base_url = "http://localhost:8050"; // Define base URL
 
 // Function to get the appropriate icon based on file type
 const getFileIcon = (fileType) => {
@@ -41,6 +42,7 @@ const getCurrentUserRoles = () => {
 
 const SubjectPage = () => {
     const { subjectId } = useParams(); // Extract subjectId from route parameters
+    const navigate = useNavigate(); // Initialize useNavigate
     const [subject, setSubject] = useState(null);
     const [error, setError] = useState(null);
     const [enrollmentStatus, setEnrollmentStatus] = useState(false); // To track enrollment status
@@ -52,6 +54,7 @@ const SubjectPage = () => {
     const [announcementTitle, setAnnouncementTitle] = useState(''); // State for announcement title
     const [announcementDescription, setAnnouncementDescription] = useState(''); // State for announcement description
     const [scheduledFor, setScheduledFor] = useState(''); // State for scheduledFor
+    const [attendanceSubmitted, setAttendanceSubmitted] = useState(false); // Track if attendance is submitted
 
     const roles = getCurrentUserRoles();
     const isTeacher = roles === 'ROLE_TEACHER'; // Simplified role checking
@@ -77,6 +80,26 @@ const SubjectPage = () => {
                 setAnnouncements(data);
             } catch (err) {
                 console.error('Error fetching announcements:', err);
+            }
+        };
+
+        const checkAttendanceStatus = async () => {
+            try {
+                const token = localStorage.getItem('jwtToken');
+                const response = await axios.get(`${base_url}/api/attendance/status/${subjectId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.status === 200 && response.data.attendanceSubmitted) {
+                    setAttendanceSubmitted(true); // Attendance already submitted for today
+                } else {
+                    setAttendanceSubmitted(false); // Attendance not yet submitted
+                }
+            } catch (error) {
+                console.error("Error checking attendance status:", error.response ? error.response.data : error.message);
             }
         };
 
@@ -165,6 +188,7 @@ const SubjectPage = () => {
         if (isTeacher) {
             fetchEnrolledStudents();
             fetchMaterials();
+            checkAttendanceStatus();
         }
 
     }, [subjectId, isStudent, isTeacher]);
@@ -315,6 +339,23 @@ const SubjectPage = () => {
                     <p><strong>Year:</strong> {subject.year || 'N/A'}</p>
                     <p><strong>Grade:</strong> {subject.grade || 'N/A'}</p>
                     <p><strong>Class:</strong> {subject.subjectClass || 'N/A'}</p>
+
+                    {isTeacher && !attendanceSubmitted && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            style={{ margin: '20px 0' }}
+                            onClick={() => navigate(`/attendance/${subjectId}`)}
+                        >
+                            Add Today's Attendance
+                        </Button>
+                    )}
+
+                    {isTeacher && attendanceSubmitted && (
+                        <p style={{ color: 'green', marginTop: '10px' }}>
+                            Attendance has already been submitted for today.
+                        </p>
+                    )}
 
                     {isTeacher && (
                         <div>

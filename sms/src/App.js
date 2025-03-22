@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SubjectPage from './components/RoleDash/SubjectPage';
 import MessagesPage from './components/RoleDash/MessagesPage';
 import ChatPage from './components/RoleDash/ChatPage';
+import AttendancePage from './components/RoleDash/AttendancePage'; // Import AttendancePage
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
       <Route path="/subject/:subjectId" element={<SubjectPage />} />
       <Route path="/messages" element={<MessagesPage />} />
       <Route path="/chat/:senderId" element={<ChatPage />} />
+      <Route path="/attendance/:subjectId" element={<AttendancePage />} /> {/* Add route for AttendancePage */}
     </Routes>
   );
 };

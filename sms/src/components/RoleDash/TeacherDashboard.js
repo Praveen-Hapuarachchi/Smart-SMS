@@ -5,18 +5,15 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Footer from '../Footer';
 import { Card, CardContent, CardActions, Collapse, IconButton, Typography, TextField, Select, MenuItem } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AddIcon from '@mui/icons-material/Add';
 
 const TeacherDashboard = () => {
   // Student management states
-  const [showStudentForm, setShowStudentForm] = useState(false); // Show/Hide student form
   const [studentData, setStudentData] = useState({ fullName: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [students, setStudents] = useState([]); // Store registered students
 
   // Subject management states
-  const [showSubjectForm, setShowSubjectForm] = useState(false); // Show/Hide subject form
   const [subjectData, setSubjectData] = useState({
     name: '',
     year: 2024,
@@ -68,7 +65,6 @@ const TeacherDashboard = () => {
       if (registeredStudent) {
         setStudents([...students, registeredStudent]);
         setStudentData({ fullName: '', email: '', password: '' });
-        setShowStudentForm(false);
       } else {
         setError('Failed to register student.');
       }
@@ -90,7 +86,6 @@ const TeacherDashboard = () => {
       if (createdSubject) {
         setSubjects([...subjects, createdSubject]);
         setSubjectData({ name: '', year: 2024, grade: 'Grade 7', subjectClass: 'A' });
-        setShowSubjectForm(false); // Close the form after successful submission
       } else {
         setError('Failed to create subject.');
       }
