@@ -10,6 +10,7 @@ import { Description, PictureAsPdf, InsertDriveFile, Image } from '@mui/icons-ma
 import DeleteIcon from '@mui/icons-material/Delete'; // Import DeleteIcon
 import Footer from '../Footer';
 
+const base_url = "http://206.189.142.249:8050"; // Define base URL
 
 // Function to get the appropriate icon based on file type
 const getFileIcon = (fileType) => {
@@ -94,7 +95,7 @@ const SubjectPage = () => {
             const studentId = decodedToken.id; // Get the student ID from the token
 
             try {
-                const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/enrollment-status`, {
+                const response = await axios.get(`${base_url}/api/subjects/${subjectId}/enrollment-status`, {
                     params: { studentId: studentId },
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -116,7 +117,7 @@ const SubjectPage = () => {
         const fetchEnrolledStudents = async () => {
             try {
                 const token = localStorage.getItem('jwtToken');
-                const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/students`, {
+                const response = await axios.get(`${base_url}/api/subjects/${subjectId}/students`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -137,7 +138,7 @@ const SubjectPage = () => {
          const fetchMaterials = async () => {
             try {
                 const token = localStorage.getItem('jwtToken');
-                const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials`, {
+                const response = await axios.get(`${base_url}/api/subjects/${subjectId}/materials`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -189,7 +190,7 @@ const SubjectPage = () => {
         formData.append('file', file);
     
         try {
-            const response = await axios.post(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials/upload`, formData, {
+            const response = await axios.post(`${base_url}/api/subjects/${subjectId}/materials/upload`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -224,7 +225,7 @@ const SubjectPage = () => {
 
         try {
             // Make the POST request with subjectId and studentId as query params
-            const response = await axios.post(`http://206.189.142.249:8050/api/subjects/${subjectId}/enroll`, null, {
+            const response = await axios.post(`${base_url}/api/subjects/${subjectId}/enroll`, null, {
                 params: { studentId: studentId },
                 headers: {
                     Authorization: `Bearer ${token}`, // Add the token in Authorization header
@@ -440,7 +441,7 @@ const SubjectPage = () => {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                href={`http://206.189.142.249:8050/api/subjects/${subjectId}/materials/${material.id}/download`}  // Make sure the URL is correct
+                                                href={`${base_url}/api/subjects/${subjectId}/materials/${material.id}/download`}  // Make sure the URL is correct
                                                 target="_blank"
                                                 download={material.fileName}  // Ensure the file name (with extension) is passed
                                                 style={{ marginRight: '10px' }}
@@ -453,7 +454,7 @@ const SubjectPage = () => {
                                             
                                                     if (token) {
                                                         // Make the API request with the Authorization header
-                                                        fetch(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials/${material.id}/download`, {
+                                                        fetch(`${base_url}/api/subjects/${subjectId}/materials/${material.id}/download`, {
                                                             method: 'GET',
                                                             headers: {
                                                                 'Authorization': `Bearer ${token}`  // Send token in the Authorization header

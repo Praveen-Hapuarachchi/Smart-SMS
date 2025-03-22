@@ -1,80 +1,59 @@
 // api-helpers.js
 import axios from "axios";
 
+const base_url = "http://206.189.142.249:8050"; // Define base URL
+
 // Get all users using axios
 export const getAllUsers = async () => {
     try {
-        // Retrieve the token from local storage
         const token = localStorage.getItem('jwtToken');
-        
-        const res = await axios.get("http://206.189.142.249:8050/users/all", {
+        const res = await axios.get(`${base_url}/users/all`, {
             headers: {
-                'Authorization': `Bearer ${token}`, // Attach the Bearer token
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
-        console.log("Full response from API:", res); // Log the entire response
-
         if (res && res.status === 200) {
-            console.log("Users data:", res.data); // Log the users data
-            return res.data; // Return the user data if the request was successful
+            return res.data;
         } else {
-            console.log("No Data");
             return null;
         }
     } catch (error) {
         console.error("Error fetching users:", error.response ? error.response.data : error.message);
-        return null; // Handle errors
+        return null;
     }
 };
 
-// Function to send user authentication request
 export const sendUserAuthRequest = async (data) => {
     try {
-        const res = await axios.post("http://206.189.142.249:8050/auth/login", {
+        const res = await axios.post(`${base_url}/auth/login`, {
             email: data.email,
             password: data.password,
         });
-
         if (res && res.status === 200) {
-            console.log('Login successful:', res.data); // Log the full response data
-
-            // Store the JWT token and user role in localStorage
-            const { token, expiresIn, role, id } = res.data;
-            localStorage.setItem('jwtToken', token); // Save token to localStorage
-
-            // Log the token, expiresIn, and role separately
-            console.log('Token:', token);
-            console.log('Expires In:', expiresIn);
-            console.log('Role:', role);
-            console.log('ID:', id);
-
-            return res.data; // Return the response data directly
+            const { token } = res.data;
+            localStorage.setItem('jwtToken', token);
+            return res.data;
         } else {
-            console.error("Unexpected error during login.");
-            return null; // Return null if there's an error
+            return null;
         }
     } catch (error) {
         console.error("Error during authentication:", error.response ? error.response.data : error.message);
-        return null; // Return null in case of error
+        return null;
     }
 };
 
-// Function to register a new teacher
 export const registerTeacher = async (teacherData) => {
     try {
-        const res = await axios.post("http://206.189.142.249:8050/auth/signup", {
+        const res = await axios.post(`${base_url}/auth/signup`, {
             fullName: teacherData.fullName,
             email: teacherData.email,
             password: teacherData.password,
-            role: 'TEACHER', // Set the role as a teacher
+            role: 'TEACHER',
         });
-
         if (res && res.status === 200) {
-            console.log('Teacher registered successfully:', res.data);
-            return res.data; // Return the registered teacher's data
+            return res.data;
         } else {
-            console.error("Error registering teacher.");
             return null;
         }
     } catch (error) {
@@ -83,21 +62,17 @@ export const registerTeacher = async (teacherData) => {
     }
 };
 
-// Function to register a student
 export const registerStudent = async (studentData) => {
     try {
-        const res = await axios.post("http://206.189.142.249:8050/auth/signup", {
+        const res = await axios.post(`${base_url}/auth/signup`, {
             fullName: studentData.fullName,
             email: studentData.email,
             password: studentData.password,
-            role: 'STUDENT',  // Set the role as a student
+            role: 'STUDENT',
         });
-
         if (res && res.status === 200) {
-            console.log('Student registered successfully:', res.data);
-            return res.data;  // Return the registered student's data
+            return res.data;
         } else {
-            console.error("Error registering student.");
             return null;
         }
     } catch (error) {
@@ -106,20 +81,16 @@ export const registerStudent = async (studentData) => {
     }
 };
 
-// Function to delete a user
 export const deleteUser = async (userId, token) => {
     try {
-        const res = await axios.delete(`http://206.189.142.249:8050/auth/delete/${userId}`, {
+        const res = await axios.delete(`${base_url}/auth/delete/${userId}`, {
             headers: {
-                Authorization: `Bearer ${token}`,  // Include the token in the Authorization header
+                Authorization: `Bearer ${token}`,
             },
         });
-
         if (res && res.status === 200) {
-            console.log(`User with ID ${userId} has been deleted successfully.`);
-            return res.data;  // Return the success message
+            return res.data;
         } else {
-            console.error("Error deleting user.");
             return null;
         }
     } catch (error) {
@@ -128,52 +99,45 @@ export const deleteUser = async (userId, token) => {
     }
 };
 
-// Function to get the authenticated user's information
 export const getAuthenticatedUser = async () => {
     try {
-        // Retrieve the token from local storage
         const token = localStorage.getItem('jwtToken');
-
-        const res = await axios.get("http://206.189.142.249:8050/users/me", {
+        const res = await axios.get(`${base_url}/users/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
-
         if (res && res.status === 200) {
-            console.log("Authenticated user data:", res.data); // Log the user data
-            return res.data; // Return the authenticated user's data
+            return res.data;
         } else {
-            console.log("No user data available");
             return null;
         }
     } catch (error) {
         console.error("Error fetching authenticated user:", error.response ? error.response.data : error.message);
-        return null; // Handle errors
+        return null;
     }
 };
 
 export const updateUser = async (userId, userData) => {
     try {
-      const token = localStorage.getItem('jwtToken');
-      const res = await axios.put(`http://206.189.142.249:8050/users/${userId}`, userData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('User updated successfully:', res.data);
-      return res.data;
+        const token = localStorage.getItem('jwtToken');
+        const res = await axios.put(`${base_url}/users/${userId}`, userData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return res.data;
     } catch (error) {
-      console.error('Error updating user:', error.response ? error.response.data : error.message);
-      return null;
+        console.error('Error updating user:', error.response ? error.response.data : error.message);
+        return null;
     }
 };
 
 export const createSubject = async (subjectData) => {
     try {
-        const response = await fetch('http://206.189.142.249:8050/api/subjects/create', { 
+        const response = await fetch(`${base_url}/api/subjects/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -181,11 +145,9 @@ export const createSubject = async (subjectData) => {
             },
             body: JSON.stringify(subjectData),
         });
-
         if (!response.ok) {
             throw new Error('Failed to create subject');
         }
-
         return await response.json();
     } catch (error) {
         console.error('Error creating subject:', error);
@@ -193,49 +155,38 @@ export const createSubject = async (subjectData) => {
     }
 };
 
-// Function to get all created subjects
 export const getAllCreatedSubjects = async () => {
     try {
-        // Retrieve the token from local storage
         const token = localStorage.getItem('jwtToken');
-
-        // Make the GET request to fetch all created subjects
-        const res = await axios.get("http://206.189.142.249:8050/api/subjects/my-subjects", {
-            headers: {
-                Authorization: `Bearer ${token}`, // Attach the Bearer token
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (res && res.status === 200) {
-            console.log('Fetched subjects successfully:', res.data);
-            return res.data; // Return the list of subjects
-        } else {
-            console.error('Failed to fetch subjects:', res.statusText);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching subjects:', error.response ? error.response.data : error.message);
-        return null; // Return null in case of error
-    }
-};
-
-// Function to fetch a specific subject by ID
-export const getSubjectById = async (subjectId) => {
-    try {
-        const token = localStorage.getItem('jwtToken');
-        const res = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}`, {
+        const res = await axios.get(`${base_url}/api/subjects/my-subjects`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-
         if (res && res.status === 200) {
-            console.log('Fetched subject successfully:', res.data);
             return res.data;
         } else {
-            console.error('Failed to fetch subject:', res.statusText);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching subjects:', error.response ? error.response.data : error.message);
+        return null;
+    }
+};
+
+export const getSubjectById = async (subjectId) => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const res = await axios.get(`${base_url}/api/subjects/${subjectId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        if (res && res.status === 200) {
+            return res.data;
+        } else {
             return null;
         }
     } catch (error) {
@@ -246,43 +197,36 @@ export const getSubjectById = async (subjectId) => {
 
 export const getAllSubjects = async () => {
     try {
-        const token = localStorage.getItem('jwtToken'); // Retrieve the JWT token
-        const res = await axios.get("http://206.189.142.249:8050/api/subjects/all", {
+        const token = localStorage.getItem('jwtToken');
+        const res = await axios.get(`${base_url}/api/subjects/all`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-
         if (res.status === 200) {
-            console.log("Subjects data:", res.data); // Log the response data
-            return res.data; // Return the data
+            return res.data;
         } else {
-            console.error("Failed to fetch subjects.");
             return null;
         }
     } catch (error) {
         console.error("Error fetching subjects:", error.response ? error.response.data : error.message);
-        return null; // Handle errors gracefully
+        return null;
     }
 };
 
-// Function to get enrolled students for a specific subject
 export const getEnrolledStudents = async (subjectId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/students`, {
+        const response = await axios.get(`${base_url}/api/subjects/${subjectId}/students`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             }
         });
-
         if (response && response.status === 200) {
-            console.log("Enrolled students:", response.data);  // Log the enrolled students
-            return response.data;  // Return the list of enrolled students
+            return response.data;
         } else {
-            console.error("Error fetching enrolled students.");
             return [];
         }
     } catch (error) {
@@ -291,90 +235,70 @@ export const getEnrolledStudents = async (subjectId) => {
     }
 };
 
-// Function to get all enrolled subjects for the authenticated student
 export const getEnrolledSubjects = async () => {
     try {
-        // Retrieve the JWT token from local storage
         const token = localStorage.getItem('jwtToken');
-
-        // Make the GET request to fetch enrolled subjects
-        const res = await axios.get("http://206.189.142.249:8050/api/subjects/enrolled", {
+        const res = await axios.get(`${base_url}/api/subjects/enrolled`, {
             headers: {
-                'Authorization': `Bearer ${token}`, // Include the Bearer token
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
-
         if (res && res.status === 200) {
-            console.log("Enrolled subjects:", res.data); // Log the enrolled subjects data
-            return res.data; // Return the enrolled subjects
+            return res.data;
         } else {
-            console.error("Failed to fetch enrolled subjects.");
-            return null; // Return null if there's an issue
+            return null;
         }
     } catch (error) {
         console.error("Error fetching enrolled subjects:", error.response ? error.response.data : error.message);
-        return null; // Handle errors gracefully
+        return null;
     }
 };
 
 export const getMaterials = async (subjectId) => {
-  try {
-    const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching materials:", error);
-    throw error;
-  }
+    try {
+        const response = await axios.get(`${base_url}/api/subjects/${subjectId}/materials`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching materials:", error);
+        throw error;
+    }
 };
 
-// Function to remove a material from a subject
 export const removeMaterial = async (subjectId, materialId) => {
     const token = localStorage.getItem('jwtToken');
-
     if (!token) {
-        console.error("No token found. Please log in.");
         return null;
     }
-
     try {
-        const response = await axios.delete(
-            `http://206.189.142.249:8050/api/subjects/${subjectId}/materials/${materialId}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            }
-        );
-
+        const response = await axios.delete(`${base_url}/api/subjects/${subjectId}/materials/${materialId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
         if (response.status === 200) {
-            console.log("Material deleted successfully");
-            return true; // Indicate success
+            return true;
         } else {
-            console.error("Failed to delete material");
             return false;
         }
     } catch (error) {
         console.error("Error deleting material:", error.response ? error.response.data : error.message);
-        return false; // Indicate failure
+        return false;
     }
 };
 
-// Function to get announcements for a specific subject
 export const getAnnouncements = async (subjectId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.get(`http://206.189.142.249:8050/api/announcements/subject/${subjectId}`, {
+        const response = await axios.get(`${base_url}/api/announcements/subject/${subjectId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             }
         });
-
         if (response && response.status === 200) {
-            return response.data; // Return the list of announcements
+            return response.data;
         } else {
-            console.error("Error fetching announcements.");
             return [];
         }
     } catch (error) {
@@ -383,21 +307,18 @@ export const getAnnouncements = async (subjectId) => {
     }
 };
 
-// Function to create a new announcement
 export const createAnnouncement = async (announcementData) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.post('http://206.189.142.249:8050/api/announcements/create', announcementData, {
+        const response = await axios.post(`${base_url}/api/announcements/create`, announcementData, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             }
         });
-
         if (response && response.status === 201) {
-            return response.data; // Return the created announcement
+            return response.data;
         } else {
-            console.error("Error creating announcement:", response.status, response.data);
             return null;
         }
     } catch (error) {
@@ -406,21 +327,17 @@ export const createAnnouncement = async (announcementData) => {
     }
 };
 
-// Function to delete an announcement
 export const deleteAnnouncement = async (announcementId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.delete(`http://206.189.142.249:8050/api/announcements/delete/${announcementId}`, {
+        const response = await axios.delete(`${base_url}/api/announcements/delete/${announcementId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
             }
         });
-
         if (response && response.status === 200) {
-            console.log("Announcement deleted successfully");
             return response.data;
         } else {
-            console.error("Error deleting announcement:", response.status, response.data);
             return null;
         }
     } catch (error) {
@@ -431,50 +348,50 @@ export const deleteAnnouncement = async (announcementId) => {
 
 export const getMessages = async (userId) => {
     try {
-      const token = localStorage.getItem('jwtToken'); // Assuming the token is saved in localStorage
-      const response = await axios.get(`http://206.189.142.249:8050/api/messages/user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
+        const token = localStorage.getItem('jwtToken');
+        const response = await axios.get(`${base_url}/api/messages/user/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
     } catch (error) {
-      throw new Error('Error fetching messages');
-    }
-  };
-
-export const sendMessage = async (messageData) => {
-    try {
-      const token = localStorage.getItem('jwtToken'); // Get the JWT token from localStorage
-      const response = await axios.post(
-        'http://206.189.142.249:8050/api/messages/send', 
-        messageData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-          }
-        }
-      );
-      return response.data; // Return the response data including the message ID and timestamp
-    } catch (error) {
-      throw new Error('Error sending message');
+        throw new Error('Error fetching messages');
     }
 };
 
-// Fetch conversation between two users
+export const sendMessage = async (messageData) => {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const response = await axios.post(`${base_url}/api/messages/send`, messageData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error('Error sending message');
+    }
+};
+
 export const getMessagesBetweenUsers = async (userId, senderId) => {
     try {
-      const token = localStorage.getItem('jwtToken'); // Assuming the token is saved in localStorage
-      const url = `http://206.189.142.249:8050/api/messages/conversation?senderId=${senderId}&receiverId=${userId}`;
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('API response:', response.data); // Debug log
-      return response.data; // Ensure that both sender and receiver messages are returned
+        const token = localStorage.getItem('jwtToken');
+        const url = `${base_url}/api/messages/conversation?senderId=${senderId}&receiverId=${userId}`;
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
     } catch (error) {
-      console.error('Error fetching messages:', error.response ? error.response.data : error.message);
-      return [];
+        console.error('Error fetching messages:', error.response ? error.response.data : error.message);
+        return [];
     }
-  };
+};
+
+
+
+
+
+
