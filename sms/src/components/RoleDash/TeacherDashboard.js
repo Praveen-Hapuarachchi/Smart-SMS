@@ -3,6 +3,9 @@ import { registerStudent, createSubject, getAllCreatedSubjects } from '../../api
 import HeaderForUser from './HeaderForUser';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Footer from '../Footer';
+import { Card, CardContent, CardActions, Collapse, IconButton, Typography, TextField, Select, MenuItem } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddIcon from '@mui/icons-material/Add';
 
 const TeacherDashboard = () => {
   // Student management states
@@ -27,6 +30,9 @@ const TeacherDashboard = () => {
   const [hoveredSubject, setHoveredSubject] = useState(null); // Track the subject being hovered over
 
   const navigate = useNavigate(); // Hook to navigate to subject page
+
+  const [expandStudentForm, setExpandStudentForm] = useState(false);
+  const [expandSubjectForm, setExpandSubjectForm] = useState(false);
 
   // Fetch all created subjects when the component mounts
   useEffect(() => {
@@ -105,121 +111,124 @@ const TeacherDashboard = () => {
       <HeaderForUser />
       <h1>Teacher Dashboard</h1>
 
-      {/* Button to show form for adding a new student */}
-      <button onClick={() => setShowStudentForm(!showStudentForm)}>
-        {showStudentForm ? 'Cancel' : 'Add New Student'}
-      </button>
+      {/* Add New Student Card */}
+      <Card style={{ marginBottom: '20px' }}>
+        <CardActions>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            Add New Student
+          </Typography>
+          <IconButton onClick={() => setExpandStudentForm(!expandStudentForm)}>
+            <ExpandMoreIcon />
+          </IconButton>
+        </CardActions>
+        <Collapse in={expandStudentForm} timeout="auto" unmountOnExit>
+          <CardContent>
+            <form onSubmit={handleAddStudent}>
+              <TextField
+                label="Full Name"
+                value={studentData.fullName}
+                onChange={(e) => setStudentData({ ...studentData, fullName: e.target.value })}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Email"
+                type="email"
+                value={studentData.email}
+                onChange={(e) => setStudentData({ ...studentData, email: e.target.value })}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Password"
+                type="password"
+                value={studentData.password}
+                onChange={(e) => setStudentData({ ...studentData, password: e.target.value })}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
+                {loading ? 'Adding...' : 'Add Student'}
+              </button>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+            </form>
+          </CardContent>
+        </Collapse>
+      </Card>
 
-      {/* Form for adding a new student */}
-      {showStudentForm && (
-        <form onSubmit={handleAddStudent}>
-          <div>
-            <label>Full Name:</label>
-            <input
-              type="text"
-              value={studentData.fullName}
-              onChange={(e) => setStudentData({ ...studentData, fullName: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label>Email:</label>
-            <input
-              type="email"
-              value={studentData.email}
-              onChange={(e) => setStudentData({ ...studentData, email: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input
-              type="password"
-              value={studentData.password}
-              onChange={(e) => setStudentData({ ...studentData, password: e.target.value })}
-              required
-            />
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Adding...' : 'Add Student'}
-          </button>
-          {/* Display error message */}
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-        </form>
-      )}
-
-      {/* Button to show form for creating a new subject */}
-      <button
-        onClick={() => setShowSubjectForm(!showSubjectForm)}
-        style={{
-          padding: '10px 20px',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-      >
-        {showSubjectForm ? 'Cancel' : 'Create New Subject'}
-      </button>
-
-      {/* Form for creating a new subject */}
-      {showSubjectForm && (
-        <form onSubmit={handleCreateSubject}>
-          <div>
-            <label>Subject Name:</label>
-            <input
-              type="text"
-              value={subjectData.name}
-              onChange={(e) => setSubjectData({ ...subjectData, name: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label>Year:</label>
-            <select
-              value={subjectData.year}
-              onChange={(e) => setSubjectData({ ...subjectData, year: e.target.value })}
-              required
-            >
-              <option value={2024}>2024</option>
-              <option value={2025}>2025</option>
-              <option value={2026}>2026</option>
-            </select>
-          </div>
-          <div>
-            <label>Grade:</label>
-            <select
-              value={subjectData.grade}
-              onChange={(e) => setSubjectData({ ...subjectData, grade: e.target.value })}
-              required
-            >
-              <option value="Grade 6">Grade 6</option>
-              <option value="Grade 7">Grade 7</option>
-              <option value="Grade 8">Grade 8</option>
-              <option value="Grade 9">Grade 9</option>
-              
-            </select>
-          </div>
-          <div>
-            <label>Subject Class:</label>
-            <select
-              value={subjectData.subjectClass}
-              onChange={(e) => setSubjectData({ ...subjectData, subjectClass: e.target.value })}
-              required
-            >
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-              <option value="D">D</option>
-              
-            </select>
-          </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : 'Create Subject'}
-          </button>
-        </form>
-      )}
+      {/* Create New Subject Card */}
+      <Card style={{ marginBottom: '20px' }}>
+        <CardActions>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            Create New Subject
+          </Typography>
+          <IconButton onClick={() => setExpandSubjectForm(!expandSubjectForm)}>
+            <ExpandMoreIcon />
+          </IconButton>
+        </CardActions>
+        <Collapse in={expandSubjectForm} timeout="auto" unmountOnExit>
+          <CardContent>
+            <form onSubmit={handleCreateSubject}>
+              <TextField
+                label="Subject Name"
+                value={subjectData.name}
+                onChange={(e) => setSubjectData({ ...subjectData, name: e.target.value })}
+                fullWidth
+                margin="normal"
+                required
+              />
+              <Typography variant="body1" style={{ marginTop: '10px' }}>
+                Year
+              </Typography>
+              <Select
+                value={subjectData.year}
+                onChange={(e) => setSubjectData({ ...subjectData, year: e.target.value })}
+                fullWidth
+                required
+              >
+                <MenuItem value={2024}>2024</MenuItem>
+                <MenuItem value={2025}>2025</MenuItem>
+                <MenuItem value={2026}>2026</MenuItem>
+              </Select>
+              <Typography variant="body1" style={{ marginTop: '10px' }}>
+                Grade
+              </Typography>
+              <Select
+                value={subjectData.grade}
+                onChange={(e) => setSubjectData({ ...subjectData, grade: e.target.value })}
+                fullWidth
+                required
+              >
+                <MenuItem value="Grade 6">Grade 6</MenuItem>
+                <MenuItem value="Grade 7">Grade 7</MenuItem>
+                <MenuItem value="Grade 8">Grade 8</MenuItem>
+                <MenuItem value="Grade 9">Grade 9</MenuItem>
+              </Select>
+              <Typography variant="body1" style={{ marginTop: '10px' }}>
+                Subject Class
+              </Typography>
+              <Select
+                value={subjectData.subjectClass}
+                onChange={(e) => setSubjectData({ ...subjectData, subjectClass: e.target.value })}
+                fullWidth
+                required
+              >
+                <MenuItem value="A">A</MenuItem>
+                <MenuItem value="B">B</MenuItem>
+                <MenuItem value="C">C</MenuItem>
+                <MenuItem value="D">D</MenuItem>
+              </Select>
+              <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
+                {loading ? 'Creating...' : 'Create Subject'}
+              </button>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
+            </form>
+          </CardContent>
+        </Collapse>
+      </Card>
 
       {/* Display My Subjects */}
       <h2>My Subjects</h2>
