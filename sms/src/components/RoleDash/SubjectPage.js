@@ -178,16 +178,16 @@ const SubjectPage = () => {
             console.error("No file selected.");
             return;
         }
-
+    
         const token = localStorage.getItem('jwtToken');
         if (!token) {
             console.error("No token found. Please log in.");
             return;
         }
-
+    
         const formData = new FormData();
         formData.append('file', file);
-
+    
         try {
             const response = await axios.post(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials/upload`, formData, {
                 headers: {
@@ -195,9 +195,12 @@ const SubjectPage = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+    
             if (response.status === 200) {
                 console.log("Material uploaded successfully");
+                // Update materials state to include the newly uploaded material
+                setMaterials((prevMaterials) => [...prevMaterials, response.data]);
+                setFile(null); // Clear the file input
             } else {
                 console.error("Failed to upload material");
             }
@@ -205,6 +208,7 @@ const SubjectPage = () => {
             console.error("Error uploading material:", error.response ? error.response.data : error.message);
         }
     };
+    
 
     const handleEnroll = async () => {
         const token = localStorage.getItem('jwtToken');
