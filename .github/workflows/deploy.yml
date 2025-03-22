@@ -9,60 +9,56 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push backend image
       - name: Build and push backend
         working-directory: ./smsbackend/smsbackend
         run: |
           docker build -t praveenlichchavi/sms-backend:latest .
           docker push praveenlichchavi/sms-backend:latest
 
-      # Build and push frontend image
       - name: Build and push frontend
         working-directory: ./sms
         run: |
           docker build -t praveenlichchavi/sms-frontend:latest .
           docker push praveenlichchavi/sms-frontend:latest
 
-      # Build and push nginx image
       - name: Build and push nginx
         working-directory: ./nginx
         run: |
           docker build -t praveenlichchavi/sms-nginx:latest .
           docker push praveenlichchavi/sms-nginx:latest
 
-      # Deploy to Digital Ocean
       - name: Deploy to Digital Ocean
         env:
           DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
           DO_HOST: ${{ secrets.DO_HOST }}
           DO_USER: ${{ secrets.DO_USER }}
         run: |
-          echo "$DO_SSH_KEY" > key.pem
+          # Write the key with proper newlines
+          printf "%s\n" "$DO_SSH_KEY" > key.pem
           chmod 400 key.pem
-          scp -o StrictHostKeyChecking=no -i key.pem docker-compose.yml ${DO_USER}@${DO_HOST}:/home/${DO_USER}/app/docker-compose.yml
+          # Debug: Check key file (optional, remove after testing)
+          cat key.pem
+          scp -o StrictHostKeyChecking=no -i key.pem docker-compose.yml ${DO_USER}@${DO_HOST}:/home/${DO_USER}/app/docker-compose.yml || { echo "SCP failed"; exit 1; }
           ssh -o StrictHostKeyChecking=no -i key.pem ${DO_USER}@${DO_HOST} << 'EOF'
             cd /home/${DO_USER}/app
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}
-            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin || { echo "Docker login failed"; exit 1; }
             docker-compose down
-            docker-compose pull
-            docker-compose up -d
+            docker-compose pull || { echo "Pull failed"; exit 1; }
+            docker-compose up -d || { echo "Up failed"; exit 1; }
             docker logout
           EOF
           rm -f key.pem
