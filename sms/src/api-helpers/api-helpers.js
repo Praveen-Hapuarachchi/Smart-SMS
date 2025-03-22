@@ -7,7 +7,7 @@ export const getAllUsers = async () => {
         // Retrieve the token from local storage
         const token = localStorage.getItem('jwtToken');
         
-        const res = await axios.get("http://localhost:8050/users/all", {
+        const res = await axios.get("http://206.189.142.249:8050/users/all", {
             headers: {
                 'Authorization': `Bearer ${token}`, // Attach the Bearer token
                 'Content-Type': 'application/json'
@@ -63,7 +63,7 @@ export const sendUserAuthRequest = async (data) => {
 // Function to register a new teacher
 export const registerTeacher = async (teacherData) => {
     try {
-        const res = await axios.post("http://localhost:8050/auth/signup", {
+        const res = await axios.post("http://206.189.142.249:8050/auth/signup", {
             fullName: teacherData.fullName,
             email: teacherData.email,
             password: teacherData.password,
@@ -86,7 +86,7 @@ export const registerTeacher = async (teacherData) => {
 // Function to register a student
 export const registerStudent = async (studentData) => {
     try {
-        const res = await axios.post("http://localhost:8050/auth/signup", {
+        const res = await axios.post("http://206.189.142.249:8050/auth/signup", {
             fullName: studentData.fullName,
             email: studentData.email,
             password: studentData.password,
@@ -106,12 +106,10 @@ export const registerStudent = async (studentData) => {
     }
 };
 
-
-
 // Function to delete a user
 export const deleteUser = async (userId, token) => {
     try {
-        const res = await axios.delete(`http://localhost:8050/auth/delete/${userId}`, {
+        const res = await axios.delete(`http://206.189.142.249:8050/auth/delete/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,  // Include the token in the Authorization header
             },
@@ -130,15 +128,13 @@ export const deleteUser = async (userId, token) => {
     }
 };
 
-
-
 // Function to get the authenticated user's information
 export const getAuthenticatedUser = async () => {
     try {
         // Retrieve the token from local storage
         const token = localStorage.getItem('jwtToken');
 
-        const res = await axios.get("http://localhost:8050/users/me", {
+        const res = await axios.get("http://206.189.142.249:8050/users/me", {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -161,7 +157,7 @@ export const getAuthenticatedUser = async () => {
 export const updateUser = async (userId, userData) => {
     try {
       const token = localStorage.getItem('jwtToken');
-      const res = await axios.put(`http://localhost:8050/users/${userId}`, userData, {
+      const res = await axios.put(`http://206.189.142.249:8050/users/${userId}`, userData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -173,17 +169,15 @@ export const updateUser = async (userId, userData) => {
       console.error('Error updating user:', error.response ? error.response.data : error.message);
       return null;
     }
-  };
+};
 
-
-
-  export const createSubject = async (subjectData) => {
+export const createSubject = async (subjectData) => {
     try {
-        const response = await fetch('http://localhost:8050/api/subjects/create', { // Use port 8050
+        const response = await fetch('http://206.189.142.249:8050/api/subjects/create', { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`, // assuming JWT is stored in localStorage
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
             },
             body: JSON.stringify(subjectData),
         });
@@ -206,7 +200,7 @@ export const getAllCreatedSubjects = async () => {
         const token = localStorage.getItem('jwtToken');
 
         // Make the GET request to fetch all created subjects
-        const res = await axios.get("http://localhost:8050/api/subjects/my-subjects", {
+        const res = await axios.get("http://206.189.142.249:8050/api/subjects/my-subjects", {
             headers: {
                 Authorization: `Bearer ${token}`, // Attach the Bearer token
                 'Content-Type': 'application/json',
@@ -230,7 +224,7 @@ export const getAllCreatedSubjects = async () => {
 export const getSubjectById = async (subjectId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const res = await axios.get(`http://localhost:8050/api/subjects/${subjectId}`, {
+        const res = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -253,7 +247,7 @@ export const getSubjectById = async (subjectId) => {
 export const getAllSubjects = async () => {
     try {
         const token = localStorage.getItem('jwtToken'); // Retrieve the JWT token
-        const res = await axios.get("http://localhost:8050/api/subjects/all", {
+        const res = await axios.get("http://206.189.142.249:8050/api/subjects/all", {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -273,13 +267,11 @@ export const getAllSubjects = async () => {
     }
 };
 
-
-
 // Function to get enrolled students for a specific subject
 export const getEnrolledStudents = async (subjectId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.get(`http://localhost:8050/api/subjects/${subjectId}/students`, {
+        const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/students`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -306,7 +298,7 @@ export const getEnrolledSubjects = async () => {
         const token = localStorage.getItem('jwtToken');
 
         // Make the GET request to fetch enrolled subjects
-        const res = await axios.get("http://localhost:8050/api/subjects/enrolled", {
+        const res = await axios.get("http://206.189.142.249:8050/api/subjects/enrolled", {
             headers: {
                 'Authorization': `Bearer ${token}`, // Include the Bearer token
                 'Content-Type': 'application/json'
@@ -328,16 +320,13 @@ export const getEnrolledSubjects = async () => {
 
 export const getMaterials = async (subjectId) => {
   try {
-    const response = await axios.get(`http://localhost:8050/api/subjects/${subjectId}/materials`);
+    const response = await axios.get(`http://206.189.142.249:8050/api/subjects/${subjectId}/materials`);
     return response.data;
   } catch (error) {
     console.error("Error fetching materials:", error);
     throw error;
   }
 };
-
-
-
 
 // Function to remove a material from a subject
 export const removeMaterial = async (subjectId, materialId) => {
@@ -350,7 +339,7 @@ export const removeMaterial = async (subjectId, materialId) => {
 
     try {
         const response = await axios.delete(
-            `http://localhost:8050/api/subjects/${subjectId}/materials/${materialId}`,
+            `http://206.189.142.249:8050/api/subjects/${subjectId}/materials/${materialId}`,
             {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -371,13 +360,11 @@ export const removeMaterial = async (subjectId, materialId) => {
     }
 };
 
-
-
 // Function to get announcements for a specific subject
 export const getAnnouncements = async (subjectId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.get(`http://localhost:8050/api/announcements/subject/${subjectId}`, {
+        const response = await axios.get(`http://206.189.142.249:8050/api/announcements/subject/${subjectId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -396,12 +383,11 @@ export const getAnnouncements = async (subjectId) => {
     }
 };
 
-
 // Function to create a new announcement
 export const createAnnouncement = async (announcementData) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.post('http://localhost:8050/api/announcements/create', announcementData, {
+        const response = await axios.post('http://206.189.142.249:8050/api/announcements/create', announcementData, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -420,12 +406,11 @@ export const createAnnouncement = async (announcementData) => {
     }
 };
 
-
 // Function to delete an announcement
 export const deleteAnnouncement = async (announcementId) => {
     try {
         const token = localStorage.getItem('jwtToken');
-        const response = await axios.delete(`http://localhost:8050/api/announcements/delete/${announcementId}`, {
+        const response = await axios.delete(`http://206.189.142.249:8050/api/announcements/delete/${announcementId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
             }
@@ -444,14 +429,10 @@ export const deleteAnnouncement = async (announcementId) => {
     }
 };
 
-
-
-
-
 export const getMessages = async (userId) => {
     try {
       const token = localStorage.getItem('jwtToken'); // Assuming the token is saved in localStorage
-      const response = await axios.get(`http://localhost:8050/api/messages/user/${userId}`, {
+      const response = await axios.get(`http://206.189.142.249:8050/api/messages/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -461,13 +442,12 @@ export const getMessages = async (userId) => {
       throw new Error('Error fetching messages');
     }
   };
-  
 
-  export const sendMessage = async (messageData) => {
+export const sendMessage = async (messageData) => {
     try {
       const token = localStorage.getItem('jwtToken'); // Get the JWT token from localStorage
       const response = await axios.post(
-        'http://localhost:8050/api/messages/send', 
+        'http://206.189.142.249:8050/api/messages/send', 
         messageData,
         {
           headers: {
@@ -479,16 +459,16 @@ export const getMessages = async (userId) => {
     } catch (error) {
       throw new Error('Error sending message');
     }
-  };
+};
 
 // Fetch conversation between two users
 export const getMessagesBetweenUsers = async (userId, senderId) => {
     try {
       const token = localStorage.getItem('jwtToken'); // Assuming the token is saved in localStorage
-      const url = `http://localhost:8050/api/messages/conversation?senderId=${senderId}&receiverId=${userId}`; // Corrected URL string with backticks
+      const url = `http://206.189.142.249:8050/api/messages/conversation?senderId=${senderId}&receiverId=${userId}`;
       const response = await axios.get(url, {
         headers: {
-          Authorization: `Bearer ${token}`, // Corrected Bearer token header
+          Authorization: `Bearer ${token}`,
         },
       });
       console.log('API response:', response.data); // Debug log
@@ -498,9 +478,3 @@ export const getMessagesBetweenUsers = async (userId, senderId) => {
       return [];
     }
   };
-
-
-
-
-
-
