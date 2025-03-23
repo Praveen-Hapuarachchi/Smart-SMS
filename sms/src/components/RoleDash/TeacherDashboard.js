@@ -1,44 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { registerStudent, createSubject, getAllCreatedSubjects } from '../../api-helpers/api-helpers'; // Import API helpers
+import { registerStudent, createSubject, getAllCreatedSubjects } from '../../api-helpers/api-helpers';
 import HeaderForUser from './HeaderForUser';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import Footer from '../Footer';
-import { Card, CardContent, CardActions, Collapse, IconButton, Typography, TextField, Select, MenuItem } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  Box,
+  InputAdornment,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
+import SubjectIcon from '@mui/icons-material/Subject';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import GradeIcon from '@mui/icons-material/Grade';
+import ClassIcon from '@mui/icons-material/Class';
 
 const TeacherDashboard = () => {
-  // Student management states
   const [studentData, setStudentData] = useState({ fullName: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [students, setStudents] = useState([]); // Store registered students
-
-  // Subject management states
+  const [students, setStudents] = useState([]);
   const [subjectData, setSubjectData] = useState({
     name: '',
     year: 2024,
     grade: 'Grade 7',
     subjectClass: 'A',
-  }); // Store subject data
-  const [subjects, setSubjects] = useState([]); // Store created subjects
+  });
+  const [subjects, setSubjects] = useState([]);
+  const [mySubjects, setMySubjects] = useState([]);
+  const [hoveredSubject, setHoveredSubject] = useState(null);
+  const navigate = useNavigate();
 
-  // My Subjects states
-  const [mySubjects, setMySubjects] = useState([]); // Store subjects created by the teacher
-  const [hoveredSubject, setHoveredSubject] = useState(null); // Track the subject being hovered over
-
-  const navigate = useNavigate(); // Hook to navigate to subject page
-
-  const [expandStudentForm, setExpandStudentForm] = useState(false);
-  const [expandSubjectForm, setExpandSubjectForm] = useState(false);
-
-  // Fetch all created subjects when the component mounts
   useEffect(() => {
     const fetchSubjects = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const fetchedSubjects = await getAllCreatedSubjects(); // Call API to fetch subjects
+        const fetchedSubjects = await getAllCreatedSubjects();
         if (fetchedSubjects) {
           setMySubjects(fetchedSubjects);
         } else {
@@ -52,9 +65,8 @@ const TeacherDashboard = () => {
     };
 
     fetchSubjects();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Handle form submission for adding a new student
   const handleAddStudent = async (e) => {
     e.preventDefault();
     setError(null);
@@ -75,16 +87,16 @@ const TeacherDashboard = () => {
     }
   };
 
-  // Handle form submission for creating a subject
   const handleCreateSubject = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      const createdSubject = await createSubject(subjectData); // Make API call to create subject
+      const createdSubject = await createSubject(subjectData);
       if (createdSubject) {
         setSubjects([...subjects, createdSubject]);
+        setMySubjects([...mySubjects, createdSubject]); // Update My Subjects list
         setSubjectData({ name: '', year: 2024, grade: 'Grade 7', subjectClass: 'A' });
       } else {
         setError('Failed to create subject.');
@@ -96,185 +108,243 @@ const TeacherDashboard = () => {
     }
   };
 
-  // Navigate to the subject page when clicked
   const handleSubjectClick = (subjectId) => {
-    navigate(`/subject/${subjectId}`); // Pass subjectId
+    navigate(`/subject/${subjectId}`);
   };
 
   return (
     <div>
       <HeaderForUser />
-      <h1>Teacher Dashboard</h1>
+      <Box sx={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <Typography variant="h4" gutterBottom>
+          Teacher Dashboard
+        </Typography>
 
-      {/* Add New Student Card */}
-      <Card style={{ marginBottom: '20px' }}>
-        <CardActions>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
-            Add New Student
-          </Typography>
-          <IconButton onClick={() => setExpandStudentForm(!expandStudentForm)}>
-            <ExpandMoreIcon />
-          </IconButton>
-        </CardActions>
-        <Collapse in={expandStudentForm} timeout="auto" unmountOnExit>
+        {/* Add New Student Card */}
+        <Card sx={{ marginBottom: '20px', boxShadow: 3 }}>
           <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Add New Student
+            </Typography>
             <form onSubmit={handleAddStudent}>
               <TextField
+                fullWidth
                 label="Full Name"
                 value={studentData.fullName}
                 onChange={(e) => setStudentData({ ...studentData, fullName: e.target.value })}
-                fullWidth
-                margin="normal"
                 required
+                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
               />
               <TextField
+                fullWidth
                 label="Email"
                 type="email"
                 value={studentData.email}
                 onChange={(e) => setStudentData({ ...studentData, email: e.target.value })}
-                fullWidth
-                margin="normal"
                 required
+                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
               />
               <TextField
+                fullWidth
                 label="Password"
                 type="password"
                 value={studentData.password}
                 onChange={(e) => setStudentData({ ...studentData, password: e.target.value })}
-                fullWidth
-                margin="normal"
                 required
+                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
               />
-              <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="success"
+                disabled={loading}
+                fullWidth
+                sx={{ marginTop: '20px' }}
+              >
                 {loading ? 'Adding...' : 'Add Student'}
-              </button>
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              </Button>
+              {error && (
+                <Typography color="error" sx={{ marginTop: '10px' }}>
+                  {error}
+                </Typography>
+              )}
             </form>
           </CardContent>
-        </Collapse>
-      </Card>
+        </Card>
 
-      {/* Create New Subject Card */}
-      <Card style={{ marginBottom: '20px' }}>
-        <CardActions>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
-            Create New Subject
-          </Typography>
-          <IconButton onClick={() => setExpandSubjectForm(!expandSubjectForm)}>
-            <ExpandMoreIcon />
-          </IconButton>
-        </CardActions>
-        <Collapse in={expandSubjectForm} timeout="auto" unmountOnExit>
+        {/* Create New Subject Card */}
+        <Card sx={{ marginBottom: '20px', boxShadow: 3 }}>
           <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Create New Subject
+            </Typography>
             <form onSubmit={handleCreateSubject}>
               <TextField
+                fullWidth
                 label="Subject Name"
                 value={subjectData.name}
                 onChange={(e) => setSubjectData({ ...subjectData, name: e.target.value })}
-                fullWidth
-                margin="normal"
                 required
+                margin="normal"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SubjectIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                variant="outlined"
               />
-              <Typography variant="body1" style={{ marginTop: '10px' }}>
-                Year
-              </Typography>
               <Select
+                fullWidth
+                label="Year"
                 value={subjectData.year}
                 onChange={(e) => setSubjectData({ ...subjectData, year: e.target.value })}
-                fullWidth
                 required
+                margin="normal"
+                sx={{ marginTop: '16px', marginBottom: '8px' }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <CalendarTodayIcon />
+                  </InputAdornment>
+                }
               >
                 <MenuItem value={2024}>2024</MenuItem>
                 <MenuItem value={2025}>2025</MenuItem>
                 <MenuItem value={2026}>2026</MenuItem>
               </Select>
-              <Typography variant="body1" style={{ marginTop: '10px' }}>
-                Grade
-              </Typography>
               <Select
+                fullWidth
+                label="Grade"
                 value={subjectData.grade}
                 onChange={(e) => setSubjectData({ ...subjectData, grade: e.target.value })}
-                fullWidth
                 required
+                margin="normal"
+                sx={{ marginTop: '16px', marginBottom: '8px' }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <GradeIcon />
+                  </InputAdornment>
+                }
               >
                 <MenuItem value="Grade 6">Grade 6</MenuItem>
                 <MenuItem value="Grade 7">Grade 7</MenuItem>
                 <MenuItem value="Grade 8">Grade 8</MenuItem>
                 <MenuItem value="Grade 9">Grade 9</MenuItem>
               </Select>
-              <Typography variant="body1" style={{ marginTop: '10px' }}>
-                Subject Class
-              </Typography>
               <Select
+                fullWidth
+                label="Subject Class"
                 value={subjectData.subjectClass}
                 onChange={(e) => setSubjectData({ ...subjectData, subjectClass: e.target.value })}
-                fullWidth
                 required
+                margin="normal"
+                sx={{ marginTop: '16px', marginBottom: '8px' }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <ClassIcon />
+                  </InputAdornment>
+                }
               >
                 <MenuItem value="A">A</MenuItem>
                 <MenuItem value="B">B</MenuItem>
                 <MenuItem value="C">C</MenuItem>
                 <MenuItem value="D">D</MenuItem>
               </Select>
-              <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                fullWidth
+                sx={{ marginTop: '20px' }}
+              >
                 {loading ? 'Creating...' : 'Create Subject'}
-              </button>
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              </Button>
+              {error && (
+                <Typography color="error" sx={{ marginTop: '10px' }}>
+                  {error}
+                </Typography>
+              )}
             </form>
           </CardContent>
-        </Collapse>
-      </Card>
+        </Card>
 
-      {/* Display My Subjects */}
-      <h2>My Subjects</h2>
-      {loading && <p>Loading subjects...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {mySubjects.length > 0 ? (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#2196F3', color: 'white' }}>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Subject Name</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Year</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Grade</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Class</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mySubjects.map((subject) => (
-              <tr
-                key={subject.id}
-                onClick={() => handleSubjectClick(subject.id)}
-                onMouseEnter={() => setHoveredSubject(subject.id)}
-                onMouseLeave={() => setHoveredSubject(null)}
-                style={{
-                  backgroundColor: hoveredSubject === subject.id ? '#f0f0f0' : 'transparent',
-                  cursor: 'pointer',
-                }}
-              >
-                <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                  {subject.name}
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                  {subject.year}
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                  {subject.grade}
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                  {subject.subjectClass}
-                </td>
-                <td style={{ padding: '10px', border: '1px solid #ddd', textAlign: 'center' }}>
-                  {subject.id}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No subjects available.</p>
-      )}
-
+        {/* My Subjects Section */}
+        <Typography variant="h5" gutterBottom>
+          My Subjects
+        </Typography>
+        {loading && <Typography>Loading subjects...</Typography>}
+        {error && (
+          <Typography color="error" sx={{ marginBottom: '20px' }}>
+            {error}
+          </Typography>
+        )}
+        {mySubjects.length > 0 ? (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="subjects table">
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#2196F3' }}>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Subject Name</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Year</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Grade</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">Class</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }} align="center">ID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {mySubjects.map((subject) => (
+                  <TableRow
+                    key={subject.id}
+                    onClick={() => handleSubjectClick(subject.id)}
+                    onMouseEnter={() => setHoveredSubject(subject.id)}
+                    onMouseLeave={() => setHoveredSubject(null)}
+                    sx={{
+                      backgroundColor: hoveredSubject === subject.id ? '#f0f0f0' : 'transparent',
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: '#f5f5f5' },
+                    }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {subject.name}
+                    </TableCell>
+                    <TableCell align="center">{subject.year}</TableCell>
+                    <TableCell align="center">{subject.grade}</TableCell>
+                    <TableCell align="center">{subject.subjectClass}</TableCell>
+                    <TableCell align="center">{subject.id}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Typography>No subjects available.</Typography>
+        )}
+      </Box>
       <Footer />
     </div>
   );

@@ -5,9 +5,10 @@ import { Button, Table, TableBody, TableCell, TableHead, TableRow, Radio, RadioG
 import Alert from '@mui/material/Alert';
 import HeaderForUser from './HeaderForUser'; // Adjust path as needed
 import Footer from '../Footer'; // Adjust path as needed
+import { base_url } from '../../api-helpers/api-helpers'; // Import base_url
 
 //const base_url = "http://localhost:8050";
-const base_url = "http://206.189.142.249:8050"; // Define base URL
+//const base_url = "http://206.189.142.249:8050"; // Define base URL
 
 const AttendancePage = () => {
     const { subjectId } = useParams();

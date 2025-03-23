@@ -2,6 +2,7 @@ package com.example.smsbackend.controllers;
 
 import com.example.smsbackend.entities.Attendance;
 import com.example.smsbackend.services.AttendanceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,17 @@ public class AttendanceController {
     public ResponseEntity<List<Attendance>> getAttendanceByStudent(@PathVariable Long studentId) {
         List<Attendance> attendanceList = attendanceService.getAttendanceByStudent(studentId);
         return ResponseEntity.ok(attendanceList);
+    }
+
+    // New endpoint to get conducted dates for a subject
+    @GetMapping("/subject/{subjectId}/dates")
+    public ResponseEntity<List<LocalDate>> getConductedDatesBySubject(@PathVariable Long subjectId) {
+        try {
+            List<LocalDate> dates = attendanceService.getConductedDatesBySubject(subjectId);
+            return ResponseEntity.ok(dates);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @Getter

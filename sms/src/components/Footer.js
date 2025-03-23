@@ -1,66 +1,94 @@
 import React from "react";
 import { Box, Container, Grid, Typography, IconButton } from "@mui/material";
-import { Github, Facebook, Instagram, Twitter,Youtube  } from "lucide-react";
+import { Github, Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { styled } from '@mui/material/styles';
+
+// Styled components
+const StyledFooter = styled(Box)(({ theme }) => ({
+  width: "100%",
+  background: 'linear-gradient(90deg, #1976d2, #42a5f5)', // Gradient background matching the header
+  padding: '2rem 0',
+  marginTop: '2rem',
+  boxShadow: theme.shadows[4],
+  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+}));
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  color: "#fff",
+  transition: 'transform 0.2s ease, color 0.3s ease',
+  '&:hover': {
+    color: '#ffeb3b',
+    transform: 'scale(1.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+}));
 
 const Footer = () => {
-  // Social Media Links
   const socialLinks = [
     {
-      icon: <Github size={20} />,
+      icon: <Github size={24} />,
       href: "https://github.com",
       label: "GitHub",
     },
     {
-      icon: <Twitter size={20} />,
+      icon: <Twitter size={24} />,
       href: "https://twitter.com",
       label: "Twitter",
     },
     {
-      icon: <Facebook size={20} />,
+      icon: <Facebook size={24} />,
       href: "https://facebook.com",
       label: "Facebook",
     },
     {
-      icon: <Instagram size={20} />,
+      icon: <Instagram size={24} />,
       href: "https://instagram.com",
       label: "Instagram",
     },
     {
-      icon: <Youtube size={20} />, // Added YouTube icon
+      icon: <Youtube size={24} />,
       href: "https://youtube.com",
       label: "YouTube",
     },
   ];
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        height: "auto",
-        backgroundColor: "#1976d2", // Same color as the header
-        paddingTop: "1rem",
-        paddingBottom: "1rem",
-        marginTop: "2rem",
-      }}
-    >
+    <StyledFooter>
       <Container maxWidth="lg">
-        <Grid container direction="column" alignItems="center">
+        <Grid container direction="column" alignItems="center" spacing={2}>
           {/* Title */}
           <Grid item xs={12}>
-            <Typography color="white" variant="h5">
+            <Typography
+              variant="h5"
+              sx={{
+                color: '#fff',
+                fontWeight: 'bold',
+                letterSpacing: '1px',
+                transition: 'transform 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                },
+              }}
+            >
               STUDENT MANAGEMENT SYSTEM
             </Typography>
           </Grid>
 
           {/* Subtitle */}
           <Grid item xs={12}>
-            <Typography color="white" variant="subtitle1">
-              {`${new Date().getFullYear()} || Created By UOR || FOE `}
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '14px',
+              }}
+            >
+              {`${new Date().getFullYear()} || Created By UOR || FOE`}
             </Typography>
           </Grid>
 
           {/* Social Media Icons */}
-          <Grid item xs={12} sx={{ marginTop: "1rem" }}>
+          <Grid item xs={12}>
             <Grid container spacing={2} justifyContent="center">
               {socialLinks.map((link) => (
                 <Grid item key={link.label}>
@@ -70,14 +98,9 @@ const Footer = () => {
                     rel="noopener noreferrer"
                     aria-label={link.label}
                   >
-                    <IconButton
-                      sx={{
-                        color: "white",
-                        "&:hover": { color: "#ffeb3b" }, // Hover effect
-                      }}
-                    >
+                    <StyledIconButton>
                       {link.icon}
-                    </IconButton>
+                    </StyledIconButton>
                   </a>
                 </Grid>
               ))}
@@ -85,7 +108,7 @@ const Footer = () => {
           </Grid>
         </Grid>
       </Container>
-    </Box>
+    </StyledFooter>
   );
 };
 

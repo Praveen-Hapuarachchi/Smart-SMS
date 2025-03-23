@@ -1,46 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { getMessagesBetweenUsers, sendMessage } from '../../api-helpers/api-helpers';
-import { TextField, Button, Box, CircularProgress, Typography, Paper } from '@mui/material';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  CircularProgress,
+  Card,
+  CardContent,
+  Avatar,
+  InputAdornment,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useParams, useLocation } from 'react-router-dom';
 import HeaderForUser from './HeaderForUser';
-import backgroundImage from '../../assets/Message.png'; // Correct import path for the background image
-import SendIcon from '@mui/icons-material/Send'; // Import SendIcon from Material-UI
+import backgroundImage from '../../assets/Message.png';
+import SendIcon from '@mui/icons-material/Send';
+import ChatIcon from '@mui/icons-material/Chat';
+import Footer from '../Footer';
+
+// Styled Components
+const StyledCard = styled(Card)(({ theme }) => ({
+  boxShadow: theme.shadows[3],
+  borderRadius: '16px',
+  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+}));
+
+const StyledMessageBubble = styled(Box)(({ theme, isSender }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '8px 12px',
+  borderRadius: '16px',
+  maxWidth: '80%', // Increased maxWidth for wider messages
+  wordWrap: 'break-word',
+  backgroundColor: isSender ? '#1976d2' : '#f1f1f1',
+  color: isSender ? '#fff' : '#000',
+  marginBottom: '10px',
+  boxShadow: theme.shadows[1],
+}));
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { senderId } = useParams(); // Get senderId from URL params
-  const { state } = useLocation(); // Get senderName from state
-  const senderName = state?.senderName || 'Unknown'; // Default to 'Unknown' if senderName is not provided
+  const { senderId } = useParams();
+  const { state } = useLocation();
+  const senderName = state?.senderName || 'Unknown';
   const userId = localStorage.getItem('userId');
-  const userName = localStorage.getItem('userName'); // Get the username from localStorage
+  const userName = localStorage.getItem('userName');
 
   useEffect(() => {
-    console.log('userId:', userId); // Debug log
-    console.log('senderId:', senderId); // Debug log
+    console.log('userId:', userId);
+    console.log('senderId:', senderId);
 
     if (userId && senderId) {
       const fetchMessages = async () => {
         setIsLoading(true);
         try {
-          // First API call: Get messages from sender to receiver (senderId -> userId)
           const senderMessages = await getMessagesBetweenUsers(senderId, userId);
-          console.log('Sender to Receiver Messages:', senderMessages); // Debug log
+          console.log('Sender to Receiver Messages:', senderMessages);
 
-          // Second API call: Get messages from receiver to sender (userId -> senderId)
           const receiverMessages = await getMessagesBetweenUsers(userId, senderId);
-          console.log('Receiver to Sender Messages:', receiverMessages); // Debug log
+          console.log('Receiver to Sender Messages:', receiverMessages);
 
-          // Combine both message sets and sort them by timestamp
-          const allMessages = [...senderMessages, ...receiverMessages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-          // Remove duplicates
-          const uniqueMessages = allMessages.filter((message, index, self) =>
-            index === self.findIndex((m) => m.id === message.id)
+          const allMessages = [...senderMessages, ...receiverMessages].sort(
+            (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
           );
 
-          setMessages(uniqueMessages); // Update state with unique messages
+          const uniqueMessages = allMessages.filter(
+            (message, index, self) => index === self.findIndex((m) => m.id === message.id)
+          );
+
+          setMessages(uniqueMessages);
         } catch (error) {
           console.error('Error fetching messages:', error);
         } finally {
@@ -56,25 +87,22 @@ const ChatPage = () => {
 
     setIsLoading(true);
     try {
-      // Send message to the server only if the message content is valid
       const response = await sendMessage({
         senderId: userId,
         receiverId: senderId,
         content: newMessage,
       });
 
-      // Add the new message to the state directly after sending it
       const newMessageObject = {
-        id: response.id, // Use the ID from the response
+        id: response.id,
         sender: { id: userId, fullName: userName },
         receiver: { id: senderId, fullName: senderName },
         content: newMessage,
-        timestamp: response.timestamp, // Use the timestamp from the response
+        timestamp: response.timestamp,
       };
 
       setMessages((prevMessages) => [...prevMessages, newMessageObject]);
-
-      setNewMessage(''); // Clear the input field after sending the message
+      setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -85,83 +113,119 @@ const ChatPage = () => {
   return (
     <Box
       sx={{
-        padding: 3,
-        maxWidth: 600,
-        margin: '0 auto',
-        backgroundImage: `url(${backgroundImage})`, // Set the background image
-        backgroundSize: 'cover', // Cover the entire area
-        backgroundPosition: 'center', // Center the image
-        backgroundRepeat: 'no-repeat', // Do not repeat the image
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
-      <Box sx={{ width: '100%', marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}>
-        <HeaderForUser />
-      </Box>
-      <Typography variant="h4" gutterBottom>
-        Chat with {senderName}
-      </Typography>
+      <HeaderForUser sx={{ width: '100%', mb: 2 }} />
+      <Box sx={{ flexGrow: 1, padding: 3, maxWidth: 800, margin: '0 auto' }}> {/* Increased maxWidth to 800 */}
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: '#1976d2', textAlign: 'center', mb: 4 }}
+        >
+          Chat with {senderName}
+        </Typography>
 
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Box>
-          <Box sx={{ maxHeight: '400px', overflowY: 'auto', marginBottom: 2 }}>
-            {messages.length === 0 ? (
-              <Typography>No messages found</Typography>
+        <StyledCard>
+          <CardContent>
+            {isLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                <CircularProgress />
+              </Box>
             ) : (
-              messages.map((message) => (
-                <Box
-                  key={message.id} // Ensure unique keys
-                  sx={{
-                    display: 'flex',
-                    justifyContent: message.sender.fullName === userName ? 'flex-end' : 'flex-start', // Align messages based on sender's name comparison
-                    marginBottom: 2,
-                  }}
-                >
-                  <Paper
-                    elevation={3}
+              <Box>
+                {/* Chat Messages */}
+                <Box sx={{ maxHeight: '400px', overflowY: 'auto', mb: 3 }}>
+                  {messages.length === 0 ? (
+                    <Typography sx={{ textAlign: 'center', color: 'grey.500' }}>
+                      No messages found
+                    </Typography>
+                  ) : (
+                    messages.map((message) => {
+                      const isSender = message.sender.fullName === userName;
+                      return (
+                        <Box
+                          key={message.id}
+                          sx={{
+                            display: 'flex',
+                            justifyContent: isSender ? 'flex-end' : 'flex-start',
+                            mb: 2,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {!isSender && (
+                              <Avatar sx={{ bgcolor: '#757575' }}>{senderName[0]}</Avatar>
+                            )}
+                            <StyledMessageBubble isSender={isSender}>
+                              {/* Message content above */}
+                              <Typography variant="body1">{message.content}</Typography>
+                              {/* Sender details below in one row */}
+                              <Box sx={{ display: 'flex', justifyContent: isSender ? 'flex-end' : 'flex-start', mt: 0.5 }}>
+                                <Typography
+                                  variant="caption"
+                                  sx={{ opacity: 0.8 }}
+                                >
+                                  {isSender ? 'You' : message.sender.fullName} at{' '}
+                                  {new Date(message.timestamp).toLocaleString()}
+                                </Typography>
+                              </Box>
+                            </StyledMessageBubble>
+                            {isSender && (
+                              <Avatar sx={{ bgcolor: '#1976d2' }}>{userName[0]}</Avatar>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    })
+                  )}
+                </Box>
+
+                {/* Message Input */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <TextField
+                    label="Type a message"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    rows={1}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <ChatIcon sx={{ color: 'grey.500' }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    endIcon={<SendIcon />}
+                    onClick={handleSendMessage}
+                    disabled={isLoading || !newMessage}
                     sx={{
-                      backgroundColor: message.sender.fullName === userName ? '#dcf8c6' : '#f1f1f1',
-                      color: 'black',
-                      borderRadius: 2,
-                      padding: '10px 15px',
-                      maxWidth: '70%',
-                      wordWrap: 'break-word',
+                      mt: 1,
+                      borderRadius: '8px',
+                      textTransform: 'uppercase',
+                      padding: '10px 20px',
                     }}
                   >
-                    <Typography>{message.content}</Typography>
-                    <Typography variant="caption" sx={{ display: 'block', textAlign: message.sender.fullName === userName ? 'right' : 'left' }}>
-                      {message.sender.fullName === userName ? 'You' : message.sender.fullName} at {new Date(message.timestamp).toLocaleString()}
-                    </Typography>
-                  </Paper>
+                    Send Message
+                  </Button>
                 </Box>
-              ))
+              </Box>
             )}
-          </Box>
-
-          <TextField
-            label="Type a message"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            fullWidth
-            margin="normal"
-            multiline
-            rows={4}
-            variant="outlined"
-          />
-          <Button
-            variant="contained"
-            endIcon={<SendIcon />} // Add the SendIcon to the button
-            onClick={handleSendMessage}
-            sx={{ mt: 2 }}
-            disabled={isLoading || !newMessage}
-          >
-            Send Message
-          </Button>
-        </Box>
-      )}
+          </CardContent>
+        </StyledCard>
+      </Box>
+      <Footer />
     </Box>
   );
 };

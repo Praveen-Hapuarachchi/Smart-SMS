@@ -1,11 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import { getMessages, sendMessage, getAllUsers, getMessagesBetweenUsers } from '../../api-helpers/api-helpers';
-import { Box, List, ListItem, CircularProgress, Typography, TextField, Button } from '@mui/material';
+import {
+  Box,
+  List,
+  ListItem,
+  CircularProgress,
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Avatar,
+  InputAdornment,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import HeaderForUser from './HeaderForUser';
-import SendIcon from '@mui/icons-material/Send'; // Import SendIcon from Material-UI
-import backgroundImage from '../../assets/Message_BG.png'; // Import the background image
+import SendIcon from '@mui/icons-material/Send';
+import PersonIcon from '@mui/icons-material/Person';
+import ChatIcon from '@mui/icons-material/Chat';
+import backgroundImage from '../../assets/Message_BG.png';
 import Footer from '../Footer';
+
+// Styled Components
+const StyledCard = styled(Card)(({ theme }) => ({
+  boxShadow: theme.shadows[3],
+  borderRadius: '8px',
+  marginBottom: '16px',
+  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+  '&:hover': {
+    transform: 'translateY(-4px)',
+    boxShadow: theme.shadows[6],
+  },
+}));
+
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  padding: '12px 16px',
+  borderRadius: '4px',
+  '&:hover': {
+    backgroundColor: theme.palette.grey[100],
+    transition: 'background-color 0.3s ease',
+  },
+}));
 
 const MessagesPage = () => {
   const [messages, setMessages] = useState([]);
@@ -25,7 +62,6 @@ const MessagesPage = () => {
           setMessages(messagesData);
           setUsers(usersData);
 
-          // Fetch the last message for each contact
           const contacts = Array.from(
             [...messagesData].reduce((map, item) => {
               const contact = item.sender?.id === userId ? item.receiver : item.sender;
@@ -100,145 +136,172 @@ const MessagesPage = () => {
     [...messages].reduce((map, item) => {
       const contact = item.sender?.id === userId ? item.receiver : item.sender;
       if (!contact) return map;
-  
+
       const existingContact = map.get(contact.id);
-      
       if (!existingContact || new Date(item.timestamp) > new Date(existingContact.timestamp)) {
         map.set(contact.id, {
           id: contact.id,
           fullName: contact.fullName || 'Unknown User',
           role: contact.role || 'Unknown',
-          lastMessage: item.lastMessage || 'No messages yet', // Use lastMessage instead of content
-          timestamp: item.timestamp, // Store timestamp for comparison
+          lastMessage: item.lastMessage || 'No messages yet',
+          timestamp: item.timestamp,
         });
       }
-      
       return map;
     }, new Map()).values()
-  ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by latest message timestamp
+  ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   const getRoleColor = (role) => {
     switch (role) {
       case 'ROLE_STUDENT':
-        return 'lightgreen';
+        return '#e8f5e9'; // Light green
       case 'ROLE_TEACHER':
-        return 'lightblue';
+        return '#e3f2fd'; // Light blue
       case 'ROLE_PRINCIPAL':
-        return 'lightcoral';
+        return '#ffebee'; // Light coral
       default:
-        return 'lightgray';
+        return '#f5f5f5'; // Light gray
+    }
+  };
+
+  const getAvatarColor = (role) => {
+    switch (role) {
+      case 'ROLE_STUDENT':
+        return '#4caf50'; // Green
+      case 'ROLE_TEACHER':
+        return '#1976d2'; // Blue
+      case 'ROLE_PRINCIPAL':
+        return '#d32f2f'; // Red
+      default:
+        return '#757575'; // Gray
     }
   };
 
   return (
     <Box
       sx={{
-        padding: 3,
-        maxWidth: 600,
-        margin: '0 auto',
-        backgroundImage: `url(${backgroundImage})`, // Set the background image
-        backgroundSize: 'cover', // Cover the entire area
-        backgroundPosition: 'center', // Center the image
-        backgroundRepeat: 'no-repeat', // Do not repeat the image
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
-      <HeaderForUser sx={{ width: '100%', marginBottom: 2, display: 'flex', justifyContent: 'flex-end' }}/>
-      <Typography variant="h4" gutterBottom sx={{ marginBottom: 2,marginTop: 2 }}>
-        Messages
-      </Typography>
+      <HeaderForUser sx={{ width: '100%', mb: 2 }} />
+      <Box sx={{ flexGrow: 1, padding: 3, maxWidth: 600, margin: '0 auto' }}>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: '#1976d2', textAlign: 'center', mb: 4 }}
+        >
+          Messages
+        </Typography>
 
-      {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <List>
-          {uniqueContacts.map((contact) => (
-            <ListItem key={contact.id} sx={{ display: 'flex', flexDirection: 'row' }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  maxWidth: '70%',
-                  padding: 1,
-                  marginBottom: 2,
-                  backgroundColor: getRoleColor(contact.role), // Apply role-based background color
-                  borderRadius: 1, // Optional: to round the corners
-                  width: '100%', // Make the container take up full width
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    alignItems: 'center',
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 'bold', cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    onClick={() =>
-                      navigate(`/chat/${contact.id}`, {
-                        state: { senderId: contact.id, senderName: contact.fullName },
-                      })
-                    }
-                  >
-                    {contact.fullName} (ID: {contact.id})
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <StyledCard>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#424242', mb: 2 }}>
+                Recent Conversations
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <List>
+                {uniqueContacts.length > 0 ? (
+                  uniqueContacts.map((contact) => (
+                    <StyledListItem
+                      key={contact.id}
+                      onClick={() =>
+                        navigate(`/chat/${contact.id}`, {
+                          state: { senderId: contact.id, senderName: contact.fullName },
+                        })
+                      }
+                      sx={{ cursor: 'pointer', backgroundColor: getRoleColor(contact.role) }}
+                    >
+                      <Avatar sx={{ bgcolor: getAvatarColor(contact.role), mr: 2 }}>
+                        {contact.fullName[0]}
+                      </Avatar>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                            {contact.fullName} (ID: {contact.id})
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'grey.600' }}>
+                            {new Date(contact.timestamp).toLocaleTimeString()}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: 'grey.700', mt: 0.5 }}>
+                          {contact.lastMessage}
+                        </Typography>
+                      </Box>
+                    </StyledListItem>
+                  ))
+                ) : (
+                  <Typography sx={{ textAlign: 'center', color: 'grey.500' }}>
+                    No conversations yet.
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 'normal',
-                      color: 'gray',
-                      backgroundColor: getRoleColor(contact.role),
-                      padding: '2px 8px',
-                      borderRadius: '10px',
-                    }}
-                  >
-                    {contact.role}
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: 'gray', fontSize: '0.85rem' }}>
-                  {contact.lastMessage}
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'gray', fontSize: '0.75rem' }}>
-                  {new Date(contact.timestamp).toLocaleString()}
-                </Typography>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
-      )}
+                )}
+              </List>
+            </CardContent>
+          </StyledCard>
+        )}
 
-      <TextField
-        label="Receiver ID"
-        value={receiverId}
-        onChange={(e) => setReceiverId(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
-
-      <TextField
-        label="Type a message"
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        fullWidth
-        margin="normal"
-        multiline
-        rows={4}
-      />
-
-      <Button
-        variant="contained"
-        endIcon={<SendIcon />} // Add the SendIcon to the button
-        onClick={handleSendMessage}
-        sx={{ mt: 2 }}
-        disabled={!newMessage || !receiverId}
-      >
-        Send Message
-      </Button>
+        {/* Message Input Section */}
+        <StyledCard>
+          <CardContent>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#424242', mb: 2 }}>
+              Send a Message
+            </Typography>
+            <TextField
+              label="Receiver ID"
+              value={receiverId}
+              onChange={(e) => setReceiverId(e.target.value)}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: 'grey.500' }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              label="Type a message"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              fullWidth
+              margin="normal"
+              variant="outlined"
+              multiline
+              rows={4}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <ChatIcon sx={{ color: 'grey.500' }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              endIcon={<SendIcon />}
+              onClick={handleSendMessage}
+              fullWidth
+              disabled={!newMessage || !receiverId || isLoading}
+              sx={{ mt: 2 }}
+            >
+              {isLoading ? 'Sending...' : 'Send Message'}
+            </Button>
+          </CardContent>
+        </StyledCard>
+      </Box>
       <Footer />
     </Box>
   );

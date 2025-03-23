@@ -61,4 +61,11 @@ public class AttendanceService {
         List<Attendance> todaysAttendance = attendanceRepository.findBySubjectAndDate(subject, today);
         return !todaysAttendance.isEmpty(); // Return true if attendance exists for today
     }
+
+    // New method to get distinct conducted dates for a subject
+    public List<LocalDate> getConductedDatesBySubject(Long subjectId) {
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found"));
+        return attendanceRepository.findDistinctDatesBySubject(subject);
+    }
 }

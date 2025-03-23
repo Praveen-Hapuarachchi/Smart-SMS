@@ -1,8 +1,8 @@
 // api-helpers.js
 import axios from "axios";
 
-const base_url = "http://206.189.142.249:8050"; // Define base URL
-//const base_url = "http://localhost:8050"; // Define base URL
+export const base_url = "http://206.189.142.249:8050"; // Define base URL
+//export const base_url = "http://localhost:8050"; // Export base_url
 
 // Get all users using axios
 export const getAllUsers = async () => {

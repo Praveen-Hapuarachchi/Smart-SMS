@@ -10,6 +10,7 @@ import SubjectPage from './components/RoleDash/SubjectPage';
 import MessagesPage from './components/RoleDash/MessagesPage';
 import ChatPage from './components/RoleDash/ChatPage';
 import AttendancePage from './components/RoleDash/AttendancePage'; // Import AttendancePage
+import ReviewAttendancePage from './components/RoleDash/ReviewAttendancePage'; // Import ReviewAttendancePage
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
       <Route path="/messages" element={<MessagesPage />} />
       <Route path="/chat/:senderId" element={<ChatPage />} />
       <Route path="/attendance/:subjectId" element={<AttendancePage />} /> {/* Add route for AttendancePage */}
+      <Route path="/reviewattendance/:subjectId" element={<ReviewAttendancePage />} /> {/* Add route for ReviewAttendancePage */}
     </Routes>
   );
 };
