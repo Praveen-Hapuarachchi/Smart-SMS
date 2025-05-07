@@ -10,13 +10,106 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
-import { styled } from '@mui/material/styles';
+import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Footer from '../Footer';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import SchoolIcon from '@mui/icons-material/School';
+import BookIcon from '@mui/icons-material/Book';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+
+// Define a modern theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+      light: '#42a5f5',
+      dark: '#1565c0',
+    },
+    secondary: {
+      main: '#f50057',
+      light: '#ff4081',
+      dark: '#c51162',
+    },
+    background: {
+      default: '#f4f6f8',
+      paper: '#ffffff',
+    },
+  },
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
+    h1: {
+      fontSize: '2.5rem',
+      fontWeight: 600,
+      color: '#1976d2',
+    },
+    h2: {
+      fontSize: '1.8rem',
+      fontWeight: 500,
+      color: '#333',
+    },
+    h3: {
+      fontSize: '1.4rem',
+      fontWeight: 500,
+      color: '#555',
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+          textTransform: 'none',
+          padding: '10px 20px',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
+          },
+        },
+      },
+    },
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          borderRadius: '8px',
+          marginBottom: '10px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          '&:before': {
+            display: 'none',
+          },
+        },
+      },
+    },
+  },
+});
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 50 },
@@ -28,86 +121,39 @@ const columns = [
   { id: 'teacherEmail', label: 'Teacher Email', minWidth: 200 },
 ];
 
-// Styled components for the table
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.common.white,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    padding: '12px 16px',
-    borderBottom: `2px solid ${theme.palette.primary.main}`,
+    fontWeight: 600,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    padding: '12px 16px',
-    borderBottom: `1px solid ${theme.palette.grey[200]}`,
+    color: '#444',
   },
 }));
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.grey[50],
+    backgroundColor: theme.palette.background.paper,
+  },
+  '&:last-child td, &:last-child th': {
+    border: 0,
   },
   '&:hover': {
-    backgroundColor: theme.palette.grey[100],
+    backgroundColor: theme.palette.primary.light,
     transition: 'background-color 0.3s ease',
-    transform: 'scale(1.01)',
-    boxShadow: theme.shadows[2],
-  },
-  transition: 'transform 0.2s ease',
-}));
-
-const StyledModalBox = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', sm: 500 },
-  maxHeight: '80vh',
-  overflowY: 'auto',
-  background: 'linear-gradient(145deg, #ffffff, #f0f4f8)',
-  borderRadius: '12px',
-  boxShadow: theme.shadows[5],
-  padding: '24px',
-  transition: 'transform 0.3s ease',
-  '&:hover': {
-    transform: 'translate(-50%, -52%)',
   },
 }));
 
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '8px',
-    transition: 'border-color 0.3s ease',
-    '&:hover fieldset': {
-      borderColor: theme.palette.primary.main,
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: theme.palette.primary.dark,
-    },
-  },
-  '& .MuiInputLabel-root': {
-    color: '#555',
-    fontWeight: '500',
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: theme.palette.primary.main,
-  },
-}));
+const drawerWidth = 240;
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  borderRadius: '8px',
-  textTransform: 'uppercase',
-  fontWeight: 'bold',
-  padding: '10px 0',
-  backgroundColor: '#1976d2',
-  color: '#fff',
-  transition: 'transform 0.2s ease, background-color 0.3s ease',
-  '&:hover': {
-    transform: 'scale(1.02)',
-    backgroundColor: theme.palette.primary.dark,
-    boxShadow: theme.shadows[2],
+const Main = styled('main')(({ theme }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  marginLeft: drawerWidth,
+  [theme.breakpoints.down('sm')]: {
+    marginLeft: 0,
   },
 }));
 
@@ -131,6 +177,7 @@ const StudentDashboard = () => {
     reasonForRequest: '',
   });
   const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -146,9 +193,7 @@ const StudentDashboard = () => {
         teacherName: subject.teacher.fullName,
         teacherEmail: subject.teacher.email,
       }));
-
-      const sortedData = formattedData.sort((a, b) => b.grade.localeCompare(a.grade));
-      setAllSubjects(sortedData);
+      setAllSubjects(formattedData);
       setError(null);
     } else {
       setError('Failed to fetch subjects. Please try again.');
@@ -167,7 +212,6 @@ const StudentDashboard = () => {
         teacherName: subject.teacher.fullName,
         teacherEmail: subject.teacher.email,
       }));
-
       setEnrolledSubjects(formattedData);
       setError(null);
     } else {
@@ -202,354 +246,419 @@ const StudentDashboard = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   useEffect(() => {
     handleFetchSubjects();
     handleFetchEnrolledSubjects();
   }, []);
 
+  // Group all subjects by grade
+  const subjectsByGrade = allSubjects.reduce((acc, subject) => {
+    const grade = subject.grade;
+    if (!acc[grade]) {
+      acc[grade] = [];
+    }
+    acc[grade].push(subject);
+    return acc;
+  }, {});
+
+  const uniqueGrades = Object.keys(subjectsByGrade).sort();
+
+  // Group enrolled subjects by grade
+  const enrolledSubjectsByGrade = enrolledSubjects.reduce((acc, subject) => {
+    const grade = subject.grade;
+    if (!acc[grade]) {
+      acc[grade] = [];
+    }
+    acc[grade].push(subject);
+    return acc;
+  }, {});
+
+  const uniqueEnrolledGrades = Object.keys(enrolledSubjectsByGrade).sort();
+
+  const drawer = (
+    <div>
+      <Typography
+        variant="h6"
+        sx={{
+          p: 2,
+          background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+          color: 'white',
+          textAlign: 'center',
+        }}
+      >
+        Dashboard Menu
+      </Typography>
+      <List>
+        <ListItem button onClick={() => navigate('/dashboard')}>
+          <ListItemIcon>
+            <SchoolIcon sx={{ color: '#1976d2' }} />
+          </ListItemIcon>
+          <ListItemText primary="Dashboard" />
+        </ListItem>
+        <ListItem button onClick={() => navigate('/subjects')}>
+          <ListItemIcon>
+            <BookIcon sx={{ color: '#1976d2' }} />
+          </ListItemIcon>
+          <ListItemText primary="Subjects" />
+        </ListItem>
+        <ListItem button onClick={handleOpen}>
+          <ListItemIcon>
+            <AssignmentIcon sx={{ color: '#1976d2' }} />
+          </ListItemIcon>
+          <ListItemText primary="Character Certificate" />
+        </ListItem>
+      </List>
+    </div>
+  );
+
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f5f7fa' }}>
-      <HeaderForUser />
-      <Box sx={{ flexGrow: 1, padding: { xs: '16px', md: '32px' }, maxWidth: '1400px', margin: '0 auto' }}>
-        <Typography
-          variant="h4"
-          gutterBottom
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
+        {/* Sidebar Drawer */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
           sx={{
-            fontWeight: 'bold',
-            color: '#1976d2',
-            textAlign: 'center',
-            mb: 4,
-            letterSpacing: '0.5px',
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
-          Student Dashboard
-        </Typography>
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
 
-        {error && (
-          <Typography
-            sx={{
-              color: '#d32f2f',
-              fontSize: '16px',
-              textAlign: 'center',
-              mb: 2,
-            }}
-          >
-            {error}
-          </Typography>
-        )}
-
-        {/* All Subjects Section */}
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            fontWeight: 'bold',
-            color: '#424242',
-            borderBottom: '2px solid #1976d2',
-            pb: 1,
-            mb: 3,
-          }}
-        >
-          All Subjects
-        </Typography>
-        <Paper
-          sx={{
-            width: '100%',
-            overflow: 'hidden',
-            mb: 4,
-            boxShadow: 5,
-            borderRadius: '12px',
-            background: 'linear-gradient(145deg, #ffffff, #f9fafb)',
-          }}
-        >
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <StyledTableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ minWidth: column.minWidth }}
-                    >
-                      {column.label}
-                    </StyledTableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {allSubjects
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <StyledTableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.id}
-                      onClick={() => handleRowClick(row.id)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <StyledTableCell key={column.id} align={column.align}>
-                            {value}
-                          </StyledTableCell>
-                        );
-                      })}
-                    </StyledTableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={allSubjects.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            sx={{
-              '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
-                fontSize: '14px',
-                color: '#555',
-              },
-            }}
-          />
-        </Paper>
-
-        {/* Enrolled Subjects Section */}
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            fontWeight: 'bold',
-            color: '#424242',
-            borderBottom: '2px solid #1976d2',
-            pb: 1,
-            mb: 3,
-          }}
-        >
-          Enrolled Subjects
-        </Typography>
-        <Paper
-          sx={{
-            width: '100%',
-            overflow: 'hidden',
-            mb: 4,
-            boxShadow: 5,
-            borderRadius: '12px',
-            background: 'linear-gradient(145deg, #ffffff, #f9fafb)',
-          }}
-        >
-          <TableContainer sx={{ maxHeight: 440 }}>
-            <Table stickyHeader aria-label="customized table">
-              <TableHead>
-                <TableRow>
-                  {columns.map((column) => (
-                    <StyledTableCell
-                      key={column.id}
-                      align={column.align}
-                      style={{ minWidth: column.minWidth }}
-                    >
-                      {column.label}
-                    </StyledTableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {enrolledSubjects
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <StyledTableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.id}
-                      onClick={() => handleRowClick(row.id)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {columns.map((column) => {
-                        const value = row[column.id];
-                        return (
-                          <StyledTableCell key={column.id} align={column.align}>
-                            {value}
-                          </StyledTableCell>
-                        );
-                      })}
-                    </StyledTableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 100]}
-            component="div"
-            count={enrolledSubjects.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            sx={{
-              '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
-                fontSize: '14px',
-                color: '#555',
-              },
-            }}
-          />
-        </Paper>
-
-        {/* Character Certificate Request Section */}
-        <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-            fontWeight: 'bold',
-            color: '#424242',
-            borderBottom: '2px solid #1976d2',
-            pb: 1,
-            mb: 3,
-          }}
-        >
-          Request Character Certificate
-        </Typography>
-        <StyledButton variant="contained" onClick={handleOpen}>
-          Request
-        </StyledButton>
-        <Modal open={open} onClose={handleClose}>
-          <StyledModalBox>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 'bold',
-                color: '#1976d2',
-                mb: 3,
-                textAlign: 'center',
-                borderBottom: '2px solid #1976d2',
-                pb: 1,
-              }}
-            >
-              Character Certificate Request Form
+        {/* Main Content */}
+        <Main>
+          <HeaderForUser onDrawerToggle={handleDrawerToggle} />
+          <Box sx={{ maxWidth: '1200px', mx: 'auto', mt: 4 }}>
+            <Typography variant="h1" sx={{ mb: 4, textAlign: 'center' }}>
+              Student Dashboard
             </Typography>
-            <form onSubmit={handleSubmit}>
-              <StyledTextField
-                label="Full Name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Date of Birth"
-                name="dateOfBirth"
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-              <StyledTextField
-                label="Admission Number"
-                name="admissionNumber"
-                value={formData.admissionNumber}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="National Identity Card (NIC) Number"
-                name="nicNumber"
-                value={formData.nicNumber}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Grade and Class"
-                name="gradeAndClass"
-                value={formData.gradeAndClass}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Period of Study"
-                name="periodOfStudy"
-                value={formData.periodOfStudy}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Subjects Studied"
-                name="subjectsStudied"
-                value={formData.subjectsStudied}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="O/L Result"
-                name="olResult"
-                value={formData.olResult}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="A/L Result"
-                name="alResult"
-                value={formData.alResult}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Extra Curricular Activities"
-                name="extraCurricular"
-                value={formData.extraCurricular}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledTextField
-                label="Reason for Request"
-                name="reasonForRequest"
-                value={formData.reasonForRequest}
-                onChange={handleInputChange}
-                fullWidth
-                margin="normal"
-                variant="outlined"
-              />
-              <StyledButton
-                variant="contained"
-                type="submit"
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Submit Request
-              </StyledButton>
-            </form>
-          </StyledModalBox>
-        </Modal>
+            {error && (
+              <Typography sx={{ color: 'red', textAlign: 'center', mb: 2 }}>
+                {error}
+              </Typography>
+            )}
+
+            {/* All Subjects Section */}
+            <Card sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h2" sx={{ mb: 2 }}>
+                  All Subjects
+                </Typography>
+                {uniqueGrades.map((grade) => (
+                  <Accordion key={grade}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`panel-${grade}-content`}
+                      id={`panel-${grade}-header`}
+                    >
+                      <Typography variant="h3">{grade}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
+                        <TableContainer sx={{ maxHeight: 440 }}>
+                          <Table stickyHeader aria-label="customized table">
+                            <TableHead>
+                              <TableRow>
+                                {columns.map((column) => (
+                                  <StyledTableCell
+                                    key={column.id}
+                                    align={column.align}
+                                    style={{ minWidth: column.minWidth }}
+                                  >
+                                    {column.label}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {subjectsByGrade[grade]
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((row) => (
+                                  <StyledTableRow
+                                    hover
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.id}
+                                    onClick={() => handleRowClick(row.id)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {columns.map((column) => {
+                                      const value = row[column.id];
+                                      return (
+                                        <StyledTableCell key={column.id} align={column.align}>
+                                          {value}
+                                        </StyledTableCell>
+                                      );
+                                    })}
+                                  </StyledTableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                        <TablePagination
+                          rowsPerPageOptions={[10, 25, 100]}
+                          component="div"
+                          count={subjectsByGrade[grade].length}
+                          rowsPerPage={rowsPerPage}
+                          page={page}
+                          onPageChange={handleChangePage}
+                          onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                      </Paper>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Enrolled Subjects Section */}
+            <Card sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h2" sx={{ mb: 2 }}>
+                  Enrolled Subjects
+                </Typography>
+                {uniqueEnrolledGrades.map((grade) => (
+                  <Accordion key={grade}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={`panel-enrolled-${grade}-content`}
+                      id={`panel-enrolled-${grade}-header`}
+                    >
+                      <Typography variant="h3">{grade}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none' }}>
+                        <TableContainer sx={{ maxHeight: 440 }}>
+                          <Table stickyHeader aria-label="customized table">
+                            <TableHead>
+                              <TableRow>
+                                {columns.map((column) => (
+                                  <StyledTableCell
+                                    key={column.id}
+                                    align={column.align}
+                                    style={{ minWidth: column.minWidth }}
+                                  >
+                                    {column.label}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {enrolledSubjectsByGrade[grade]
+                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((row) => (
+                                  <StyledTableRow
+                                    hover
+                                    role="checkbox"
+                                    tabIndex={-1}
+                                    key={row.id}
+                                    onClick={() => handleRowClick(row.id)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    {columns.map((column) => {
+                                      const value = row[column.id];
+                                      return (
+                                        <StyledTableCell key={column.id} align={column.align}>
+                                          {value}
+                                        </StyledTableCell>
+                                      );
+                                    })}
+                                  </StyledTableRow>
+                                ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                        <TablePagination
+                          rowsPerPageOptions={[10, 25, 100]}
+                          component="div"
+                          count={enrolledSubjectsByGrade[grade].length}
+                          rowsPerPage={rowsPerPage}
+                          page={page}
+                          onPageChange={handleChangePage}
+                          onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                      </Paper>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Character Certificate Request Section */}
+            <Card sx={{ mb: 4 }}>
+              <CardContent>
+                <Typography variant="h2" sx={{ mb: 2 }}>
+                  Request to Character Certificate
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleOpen}
+                  startIcon={<AssignmentIcon />}
+                >
+                  Request Certificate
+                </Button>
+                <Modal open={open} onClose={handleClose}>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: { xs: '90%', sm: 400 },
+                      bgcolor: 'background.paper',
+                      borderRadius: '12px',
+                      boxShadow: 24,
+                      p: 4,
+                      maxHeight: '80vh',
+                      overflowY: 'auto',
+                    }}
+                  >
+                    <Typography variant="h3" sx={{ mb: 3, textAlign: 'center' }}>
+                      Character Certificate Request
+                    </Typography>
+                    <form onSubmit={handleSubmit}>
+                      <TextField
+                        label="Full Name"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Date of Birth"
+                        name="dateOfBirth"
+                        type="date"
+                        value={formData.dateOfBirth}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
+                      <TextField
+                        label="Admission Number"
+                        name="admissionNumber"
+                        value={formData.admissionNumber}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="National Identity Card (NIC) Number"
+                        name="nicNumber"
+                        value={formData.nicNumber}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Grade and Class"
+                        name="gradeAndClass"
+                        value={formData.gradeAndClass}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Period of Study"
+                        name="periodOfStudy"
+                        value={formData.periodOfStudy}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Subjects Studied"
+                        name="subjectsStudied"
+                        value={formData.subjectsStudied}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="O/L Result"
+                        name="olResult"
+                        value={formData.olResult}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="A/L Result"
+                        name="alResult"
+                        value={formData.alResult}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Extra Curricular Activities"
+                        name="extraCurricular"
+                        value={formData.extraCurricular}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <TextField
+                        label="Reason for Request"
+                        name="reasonForRequest"
+                        value={formData.reasonForRequest}
+                        onChange={handleInputChange}
+                        fullWidth
+                        margin="normal"
+                        variant="outlined"
+                      />
+                      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          type="submit"
+                        >
+                          Submit Request
+                        </Button>
+                      </Box>
+                    </form>
+                  </Box>
+                </Modal>
+              </CardContent>
+            </Card>
+          </Box>
+          <Footer />
+        </Main>
       </Box>
-      <Footer />
-    </Box>
+    </ThemeProvider>
   );
 };
 
