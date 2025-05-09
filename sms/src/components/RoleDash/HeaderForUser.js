@@ -176,7 +176,7 @@ const HeaderForUser = () => {
 
   return (
     <>
-      <StyledAppBar position="static">
+      <StyledAppBar position="static" sx={{ background: 'linear-gradient(to right, #023020, #046d4a)', }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <SchoolIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 1, fontSize: '3rem' }} />
